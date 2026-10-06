@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.amxd
+Runtime_Test*.maxpat
+Chaos_FM4_UI_Check.maxpat
+runtime_test.js
+validation/*.wav
+validation/Runtime_Test.maxpat
+validation/runtime_test.js
+release/Chaos_FM4_Source/

@@ -1,0 +1,213 @@
+{
+  "patcher": {
+    "fileversion": 1,
+    "appversion": {
+      "major": 9,
+      "minor": 1,
+      "revision": 3,
+      "architecture": "arm64",
+      "modernui": 1
+    },
+    "classnamespace": "dsp.gen",
+    "rect": [
+      50,
+      50,
+      1100,
+      760
+    ],
+    "boxes": [
+      {
+        "box": {
+          "id": "code",
+          "maxclass": "codebox",
+          "numinlets": 1,
+          "numoutlets": 6,
+          "patching_rect": [
+            120,
+            55,
+            900,
+            610
+          ],
+          "code": "// CHAOS FM4 \u2014 four mutually frequency-modulated chaotic flows.\n// Each FM input scales the complete vector field, preserving the attractor's shape.\nHistory ax(.1); History ay(0); History az(0);\nHistory bx(.1); History by(0); History bz(0);\nHistory cx(.1); History cy(0); History cz(0);\nHistory dx(.1); History dy(0); History dz(0);\nHistory ma(0); History mb(0); History mc(0); History md(0);\nHistory resetold(0); History env(0); History gain(0);\n\nParam run(1,min=0,max=1);\nParam playmode(0,min=0,max=1);\nParam reset(0,min=0,max=1);\nParam midinote(60,min=0,max=127);\nParam gate(0,min=0,max=1);\nParam output(-18,min=-60,max=0);\nParam drive(1,min=.25,max=6);\nParam coupling(.35,min=0,max=1);\nParam modslew(2,min=.1,max=1000);\nParam fmmode(0,min=0,max=1);\nParam fmfloor(.5,min=.1,max=50);\nParam attack(10,min=1,max=2000);\nParam release(250,min=5,max=5000);\n\nParam ratea(72,min=1,max=350);\nParam shapea(28,min=20,max=38);\nParam levela(.7,min=0,max=1);\nParam pana(-.65,min=-1,max=1);\nParam axisa(0,min=0,max=2);\nParam rateb(96,min=1,max=350);\nParam shapeb(5.7,min=4,max=9);\nParam levelb(.6,min=0,max=1);\nParam panb(-.2,min=-1,max=1);\nParam axisb(0,min=0,max=2);\nParam ratec(55,min=1,max=350);\nParam shapec(15.6,min=12,max=19);\nParam levelc(.55,min=0,max=1);\nParam panc(.2,min=-1,max=1);\nParam axisc(0,min=0,max=2);\nParam rated(120,min=1,max=350);\nParam shaped(.208,min=.15,max=.28);\nParam leveld(.55,min=0,max=1);\nParam pand(.65,min=-1,max=1);\nParam axisd(0,min=0,max=2);\n\nParam ab(0,min=-1,max=1);\nParam ac(0,min=-1,max=1);\nParam ad(.22,min=-1,max=1);\nParam ba(.18,min=-1,max=1);\nParam bc(0,min=-1,max=1);\nParam bd(0,min=-1,max=1);\nParam ca(0,min=-1,max=1);\nParam cb(.18,min=-1,max=1);\nParam cd(0,min=-1,max=1);\nParam da(0,min=-1,max=1);\nParam db(0,min=-1,max=1);\nParam dc(.18,min=-1,max=1);\n\ndoreset = reset > .5 && resetold <= .5;\nbad = abs(ax)>100 || abs(ay)>100 || abs(az)>100 || abs(bx)>100 || abs(by)>100 || abs(bz)>100 || abs(cx)>20 || abs(cy)>20 || abs(cz)>100 || abs(dx)>20 || abs(dy)>20 || abs(dz)>20;\nif (doreset || bad) {\n    ax=.1; ay=0; az=0; bx=.1; by=0; bz=0; cx=.1; cy=0; cz=0; dx=.1; dy=0; dz=0;\n    ma=0; mb=0; mc=0; md=0;\n}\nresetold=reset;\n\n// Axis selection and fixed, attractor-specific normalization.\nrawa=axisa<.5 ? ax/20 : (axisa<1.5 ? ay/25 : (az-25)/25);\nrawb=axisb<.5 ? bx/10 : (axisb<1.5 ? by/10 : (bz-8)/8);\nrawc=axisc<.5 ? cx/2.5 : (axisc<1.5 ? cy/.5 : cz/4);\nrawd=axisd<.5 ? dx/2 : (axisd<1.5 ? dy/2 : dz/2);\nslewcoef=1-exp(-twopi*modslew/samplerate);\nma=ma+(tanh(rawa)-ma)*slewcoef; mb=mb+(tanh(rawb)-mb)*slewcoef;\nmc=mc+(tanh(rawc)-mc)*slewcoef; md=md+(tanh(rawd)-md)*slewcoef;\n\n// Matrix names read source -> destination: ab means A modulates B.\nfma=clamp(coupling*(ba*mb+ca*mc+da*md),-1,1);\nfmb=clamp(coupling*(ab*ma+cb*mc+db*md),-1,1);\nfmc=clamp(coupling*(ac*ma+bc*mb+dc*md),-1,1);\nfmd=clamp(coupling*(ad*ma+bd*mb+cd*mc),-1,1);\nkeyboard=playmode>.5 ? pow(2,(midinote-60)/12) : 1;\nbasea=ratea*keyboard; baseb=rateb*keyboard; basec=ratec*keyboard; based=rated*keyboard;\nra=fmmode<.5 ? basea*pow(2,fma*4) : basea*(1+fma*4);\nrb=fmmode<.5 ? baseb*pow(2,fmb*4) : baseb*(1+fmb*4);\nrc=fmmode<.5 ? basec*pow(2,fmc*4) : basec*(1+fmc*4);\nrd=fmmode<.5 ? based*pow(2,fmd*4) : based*(1+fmd*4);\nra=clamp(ra,fmfloor,350); rb=clamp(rb,fmfloor,350);\nrc=clamp(rc,fmfloor,350); rd=clamp(rd,fmfloor,350);\n\n// Two Euler substeps keep the continuous flows stable at audio rates.\nha=min(.008,ra/samplerate)*.5; hb=min(.008,rb/samplerate)*.5;\nhc=min(.008,rc/samplerate)*.5; hd=min(.008,rd/samplerate)*.5;\nfor (sub=0; sub<2; sub+=1) {\n    lax=10*(ay-ax); lay=ax*(shapea-az)-ay; laz=ax*ay-2.6666667*az;\n    ax=ax+ha*lax; ay=ay+ha*lay; az=az+ha*laz;\n    lbx=-by-bz; lby=bx+.2*by; lbz=.2+bz*(bx-shapeb);\n    bx=bx+hb*lbx; by=by+hb*lby; bz=bz+hb*lbz;\n    ch=( -1.143*cx + .5*(-.714+1.143)*(abs(cx+1)-abs(cx-1)) );\n    lcx=shapec*(cy-cx-ch); lcy=cx-cy+cz; lcz=-28*cy;\n    cx=cx+hc*lcx; cy=cy+hc*lcy; cz=cz+hc*lcz;\n    ldx=sin(dy)-shaped*dx; ldy=sin(dz)-shaped*dy; ldz=sin(dx)-shaped*dz;\n    dx=dx+hd*ldx; dy=dy+hd*ldy; dz=dz+hd*ldz;\n}\n\n// Read the updated states for audio. Modulation remains one sample delayed and symmetric.\nsa=tanh((axisa<.5 ? ax/20 : (axisa<1.5 ? ay/25 : (az-25)/25))*2);\nsb=tanh((axisb<.5 ? bx/10 : (axisb<1.5 ? by/10 : (bz-8)/8))*2);\nsc=tanh((axisc<.5 ? cx/2.5 : (axisc<1.5 ? cy/.5 : cz/4))*2);\nsd=tanh((axisd<.5 ? dx/2 : (axisd<1.5 ? dy/2 : dz/2))*2);\n\ntarget=(run>.5 && (playmode<.5 || gate>.001)) ? 1 : 0;\netime=target>.5 ? attack : release;\nenv=env+(target-env)*(1-exp(-1/(max(1,etime)*.001*samplerate)));\nla=cos((pana+1)*pi*.25); raPan=sin((pana+1)*pi*.25);\nlb=cos((panb+1)*pi*.25); rbPan=sin((panb+1)*pi*.25);\nlc=cos((panc+1)*pi*.25); rcPan=sin((panc+1)*pi*.25);\nld=cos((pand+1)*pi*.25); rdPan=sin((pand+1)*pi*.25);\nmixl=sa*levela*la+sb*levelb*lb+sc*levelc*lc+sd*leveld*ld;\nmixr=sa*levela*raPan+sb*levelb*rbPan+sc*levelc*rcPan+sd*leveld*rdPan;\ngain=gain+(pow(10,output/20)-gain)*(1-exp(-1/(.02*samplerate)));\nout1=tanh(dcblock(mixl)*drive)*env*gain*.7;\nout2=tanh(dcblock(mixr)*drive)*env*gain*.7;\nout3=ma; out4=mb; out5=mc; out6=md;\n"
+        }
+      },
+      {
+        "box": {
+          "id": "in1",
+          "maxclass": "newobj",
+          "text": "in 1",
+          "patching_rect": [
+            35,
+            55,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out1",
+          "maxclass": "newobj",
+          "text": "out 1",
+          "patching_rect": [
+            190,
+            700,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out2",
+          "maxclass": "newobj",
+          "text": "out 2",
+          "patching_rect": [
+            300,
+            700,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out3",
+          "maxclass": "newobj",
+          "text": "out 3",
+          "patching_rect": [
+            410,
+            700,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out4",
+          "maxclass": "newobj",
+          "text": "out 4",
+          "patching_rect": [
+            520,
+            700,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out5",
+          "maxclass": "newobj",
+          "text": "out 5",
+          "patching_rect": [
+            630,
+            700,
+            55,
+            22
+          ]
+        }
+      },
+      {
+        "box": {
+          "id": "out6",
+          "maxclass": "newobj",
+          "text": "out 6",
+          "patching_rect": [
+            740,
+            700,
+            55,
+            22
+          ]
+        }
+      }
+    ],
+    "lines": [
+      {
+        "patchline": {
+          "source": [
+            "in1",
+            0
+          ],
+          "destination": [
+            "code",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            0
+          ],
+          "destination": [
+            "out1",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            1
+          ],
+          "destination": [
+            "out2",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            2
+          ],
+          "destination": [
+            "out3",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            3
+          ],
+          "destination": [
+            "out4",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            4
+          ],
+          "destination": [
+            "out5",
+            0
+          ]
+        }
+      },
+      {
+        "patchline": {
+          "source": [
+            "code",
+            5
+          ],
+          "destination": [
+            "out6",
+            0
+          ]
+        }
+      }
+    ]
+  }
+}

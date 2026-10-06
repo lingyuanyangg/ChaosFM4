@@ -350,24 +350,6 @@ Chaos_FM4/
     └── Chaos_FM4_Source.zip     # 最小源码发布包
 ```
 
-## 开发
-
-`tools/build.py` 是生成文件的主要来源。修改构建脚本后运行：
-
-```bash
-python3 tools/build.py
-```
-
-它会重新生成：
-
-- `Chaos_FM4.maxpat`
-- `chaos_fm4_engine.gendsp`
-- `chaos_fm4_ui.js`
-- `Runtime_Test.maxpat`
-- `runtime_test.js`
-
-因此，对上述生成文件的直接修改可能在下次构建时被覆盖。算法改动应优先写入 `tools/build.py` 中的 GenExpr 源码和补丁生成逻辑。
-
 ## 验证
 
 当前版本完成了以下检查：

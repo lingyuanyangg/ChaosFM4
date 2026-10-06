@@ -348,18 +348,6 @@ Chaos_FM4/
     └── Chaos_FM4_Source.zip     # Minimal source release archive
 ```
 
-## Development
-
-`tools/build.py` is the primary source for generated files. After changing it, run:
-
-```bash
-python3 tools/build.py
-```
-
-It regenerates `Chaos_FM4.maxpat`, `chaos_fm4_engine.gendsp`, `chaos_fm4_ui.js`, `Runtime_Test.maxpat`, and `runtime_test.js`.
-
-Direct edits to these generated files may be overwritten by the next build. Algorithm changes should be made in the GenExpr source and patch-generation logic inside `tools/build.py`.
-
 ## Validation
 
 The current version has passed the following checks:

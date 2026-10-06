@@ -6,7 +6,7 @@ A Max for Live synthesizer built from four chaotic attractors that directly freq
 
 CHAOS / FM4 uses the Lorenz, Rössler, Chua, and Thomas continuous-time dynamical systems as sound generators. Each attractor contributes to the stereo mix while its state signal modulates the running speed of the other attractors through a bipolar 4×4 matrix. The instrument provides exponential FM, floor-protected linear FM, Drone and MIDI modes, and constrained parameter randomization.
 
-> This repository contains editable `.maxpat`, `.gendsp`, and JavaScript source files. It intentionally does not include an `.amxd`. Every performer-facing control uses a `live.*` object, so Live can store, map, and automate it.
+> This repository includes the ready-to-load [`Chaos_FM4.amxd`](Chaos_FM4.amxd) device and editable `.maxpat`, `.gendsp`, and JavaScript source files. Every performer-facing control uses a `live.*` object, so Live can store, map, and automate it.
 
 ## Features
 
@@ -280,7 +280,9 @@ Randomization uses constrained ranges and preserves Run, Play Mode, FM Mode, FM 
 
 ### Add It to a Max for Live Device
 
-Because the repository intentionally contains no `.amxd`, use an empty Max Instrument as the device container:
+Download the repository and keep `Chaos_FM4.amxd`, `chaos_fm4_engine.gendsp`, and `chaos_fm4_ui.js` together. Drag `Chaos_FM4.amxd` onto a MIDI track in Ableton Live, then select Drone or MIDI mode. The accompanying DSP and JavaScript files match the device's dependencies.
+
+To work with the editable source patch:
 
 1. Add an empty Max Instrument to a MIDI track in Ableton Live.
 2. Click the device's edit button to open it in Max.
@@ -289,7 +291,7 @@ Because the repository intentionally contains no `.amxd`, use an empty Max Instr
    - `Chaos_FM4.maxpat`
    - `chaos_fm4_engine.gendsp`
    - `chaos_fm4_ui.js`
-5. To create a personal device, save it into your own Live User Library. This repository does not generate or commit the resulting `.amxd`.
+5. Save your edited device into your Live User Library.
 
 The main patch sends stereo audio back to Live through `plugout~`. All performance controls use `live.dial`, `live.menu`, `live.toggle`, `live.numbox`, or `live.text`.
 
@@ -330,6 +332,7 @@ When a linear offset reaches `FM Floor`, an attractor temporarily moves at the m
 
 ```text
 Chaos_FM4/
+├── Chaos_FM4.amxd               # Ready-to-load Max for Live instrument
 ├── Chaos_FM4.maxpat             # Main patch, Live UI, MIDI, and audio routing
 ├── chaos_fm4_engine.gendsp      # Attractors, integration, FM, and audio DSP
 ├── chaos_fm4_ui.js              # Page switching and constrained randomization
@@ -378,7 +381,7 @@ See [`VALIDATION.md`](VALIDATION.md) and [`validation/report.json`](validation/r
 - Chaotic Rate is not precise pitch; keyboard input scales the system time axes.
 - The current matrix omits the four self-FM diagonal routes.
 - The engine uses two Euler substeps rather than a higher-order solver. Extreme settings can still produce a distinct numerical character.
-- The repository does not provide an `.amxd`, VST, AU, or standalone application.
+- The device runs in Max for Live; VST, AU, and standalone builds are not provided.
 - No open-source license has been declared. Standard copyright restrictions apply until a license is added.
 
 ## Contributing

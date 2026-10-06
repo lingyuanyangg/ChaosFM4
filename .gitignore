@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.amxd
+!Chaos_FM4.amxd
 Runtime_Test*.maxpat
 Chaos_FM4_UI_Check.maxpat
 runtime_test.js

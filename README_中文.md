@@ -1,10 +1,14 @@
 # CHAOS / FM4
 
-这是一个 Max for Live 可用的 `.maxpat` 源补丁，不包含 `.amxd`。四个声音核心分别为 Lorenz、Rössler、Chua 和 Thomas 吸引子，并通过 12 路有方向的速度 FM 矩阵互相调制，支持指数和带下限保护的线性 FM。
+这是一个提供 `.amxd` 设备和 `.maxpat` 源补丁的 Max for Live 合成器。四个声音核心分别为 Lorenz、Rössler、Chua 和 Thomas 吸引子，并通过 12 路有方向的速度 FM 矩阵互相调制，支持指数和带下限保护的线性 FM。
 
 完整英文版见 [`README.md`](README.md)，完整中文版见 [`README_zh-CN.md`](README_zh-CN.md)。
 
 ## 使用
+
+直接使用：将 `Chaos_FM4.amxd` 与 `chaos_fm4_engine.gendsp`、`chaos_fm4_ui.js` 放在同一文件夹，把 `.amxd` 拖入 Live 的 MIDI 轨道。
+
+编辑源补丁：
 
 1. 在 Ableton Live 新建一个空白 Max Instrument。
 2. 点击设备标题栏中的编辑按钮打开 Max。
@@ -31,6 +35,8 @@
 矩阵默认是弱环形连接：A→D、D→C、C→B、B→A。先用 `FM Amount` 控制整体强度，再调整单独连接。
 
 ## 文件
+
+- `Chaos_FM4.amxd`：可直接加载的 Max for Live 乐器。
 
 - `Chaos_FM4.maxpat`：主补丁和全部 `live.*` UI。
 - `chaos_fm4_engine.gendsp`：逐采样 DSP 与 4×4 FM 网络。

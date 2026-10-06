@@ -6,7 +6,7 @@
 
 CHAOS / FM4 使用 Lorenz、Rössler、Chua 和 Thomas 四组连续时间动力系统作为声音核心。每个核心的状态既进入立体声混音，也通过一个 4×4 双极性矩阵调制其他核心的运行速度。项目提供指数 FM、带最低速率保护的线性 FM、Drone/MIDI 演奏模式，以及受约束的参数随机化。
 
-> 本仓库提供可编辑的 `.maxpat`、`.gendsp` 和 JavaScript 源文件，不提供 `.amxd`。所有面向演奏者的控件均使用 `live.*` 对象，可由 Live 保存、映射和自动化。
+> 本仓库提供可直接加载的 [`Chaos_FM4.amxd`](Chaos_FM4.amxd) 设备，以及可编辑的 `.maxpat`、`.gendsp` 和 JavaScript 源文件。所有面向演奏者的控件均使用 `live.*` 对象，可由 Live 保存、映射和自动化。
 
 ## 主要特性
 
@@ -284,7 +284,9 @@ $$
 
 ### 加入 Max for Live 设备
 
-由于仓库刻意不包含 `.amxd`，请使用一个空白 Max Instrument 作为容器：
+下载仓库后，将 `Chaos_FM4.amxd`、`chaos_fm4_engine.gendsp` 和 `chaos_fm4_ui.js` 保持在同一文件夹。把 `Chaos_FM4.amxd` 拖入 Ableton Live 的 MIDI 轨道，选择 Drone 或 MIDI 模式即可使用。随附的 DSP 和 JavaScript 文件与设备依赖一致。
+
+如需编辑源码补丁：
 
 1. 在 Ableton Live 的 MIDI 轨道加入一个空白 Max Instrument。
 2. 点击设备标题栏中的编辑按钮，在 Max 中打开设备。
@@ -293,7 +295,7 @@ $$
    - `Chaos_FM4.maxpat`
    - `chaos_fm4_engine.gendsp`
    - `chaos_fm4_ui.js`
-5. 如需保存成个人设备，请在自己的 Live User Library 中另存；本仓库不会生成或提交 `.amxd`。
+5. 将修改后的设备另存到自己的 Live User Library。
 
 主补丁通过 `plugout~` 将立体声送回 Live。所有面向演奏的参数均由 `live.dial`、`live.menu`、`live.toggle`、`live.numbox` 或 `live.text` 实现。
 
@@ -334,6 +336,7 @@ Matrix          同时使用正负深度
 
 ```text
 Chaos_FM4/
+├── Chaos_FM4.amxd               # 可直接加载的 Max for Live 乐器
 ├── Chaos_FM4.maxpat             # 主补丁、Live UI、MIDI 和音频路由
 ├── chaos_fm4_engine.gendsp      # 四个吸引子、积分器、FM 与混音 DSP
 ├── chaos_fm4_ui.js              # 页面切换与受约束随机化
@@ -388,7 +391,7 @@ python3 tools/build.py
 - 混沌 Rate 不是准确音高，键盘只缩放系统时间尺度。
 - 当前矩阵不包含四条自 FM 对角线。
 - 使用两次 Euler 子步而非高阶积分器；极端参数仍可能产生明显的数值音色。
-- 本仓库不提供 `.amxd`、VST、AU 或独立应用。
+- 设备运行于 Max for Live，尚未提供 VST、AU 或独立应用版本。
 - 项目尚未声明开源许可证；在添加许可证之前，默认版权规则仍然适用。
 
 ## 贡献

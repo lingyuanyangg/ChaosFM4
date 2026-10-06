@@ -132,7 +132,7 @@ $f_b$ is `FM Bandwidth`, ranging from 0.1 to 1000 Hz, and $f_s$ is the sample ra
 Let $d_{ji}$ denote the matrix depth from source $j$ to destination $i$. The combined modulation for target $i$ is:
 
 $$
-u_i=\operatorname{clamp}\left(C\sum_{j\ne i}d_{ji}m_j,-1,1\right)
+u_i=\min\left(1,\max\left(-1,C\sum_{j\ne i}d_{ji}m_j\right)\right)
 $$
 
 $C$ is the global `FM Amount`. The diagonal is omitted, so this version does not provide self-FM. Every connection ranges from -1 to +1; its sign determines the modulation direction.
@@ -160,7 +160,7 @@ $$
 The linear expression can reach zero or become negative. Backward integration is usually unstable for dissipative attractors, so the engine applies this clamp before integration:
 
 $$
-r_i\leftarrow\operatorname{clamp}(r_i,r_{\min},350)
+r_i\leftarrow\min\left(350,\max\left(r_{\min},r_i\right)\right)
 $$
 
 `FM Floor` controls $r_{\min}$ from 0.1 to 50. The clamp creates a nonlinear corner when the rate reaches the floor, but prevents negative speed from rapidly destabilizing the internal state.

@@ -134,9 +134,7 @@ $$
 矩阵参数记作 $d_{ji}$，表示来源 $j$ 调制目标 $i$。对目标 $i$：
 
 $$
-u_i=\operatorname{clamp}\left(
-C\sum_{j\ne i}d_{ji}m_j,-1,1
-\right)
+u_i=\min\left(1,\max\left(-1,C\sum_{j\ne i}d_{ji}m_j\right)\right)
 $$
 
 $C$ 是全局 `FM Amount`。矩阵对角线被省略，因此当前版本没有自 FM。每个连接的范围是 -1 到 +1；正负号决定调制方向。
@@ -164,7 +162,7 @@ $$
 线性表达式可以得到零或负值。耗散型吸引子倒向积分通常不稳定，因此积分前统一执行：
 
 $$
-r_i\leftarrow\operatorname{clamp}(r_i,r_{\min},350)
+r_i\leftarrow\min\left(350,\max\left(r_{\min},r_i\right)\right)
 $$
 
 $r_{\min}$ 由 `FM Floor` 控制，范围 0.1–50。这个保护会在到达下限时形成非线性折点，但可避免负速率造成状态快速发散。
